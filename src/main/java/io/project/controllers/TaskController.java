@@ -1,9 +1,18 @@
 package io.project.controllers;
 
 import java.util.List;
+import java.util.Map;
+
+import javax.management.Query;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,14 +22,31 @@ import org.springframework.web.servlet.ModelAndView;
 
 import io.project.domain.Task;
 import io.project.domain.User;
-import io.project.repository.TaskRepository;
+import io.project.repository.UsersTaskRepository;
 
 @RestController
 public class TaskController 
 {
 
 	@Autowired
-	TaskRepository taskRepository;
+	UsersTaskRepository usersTaskRepository;
+	
+	
+	@RequestMapping("/")
+	public ModelAndView home()
+	{
+		List<User> usersInfo = usersTaskRepository.findAll();
+		Map<String, Object> model = new HashMap<String, Object>();
+        model.put("userInfo", usersInfo);
+        
+        return new ModelAndView("home", model);
+	}
+	
+	@ModelAttribute("usersInfo")
+	public List<User> usersInfo()
+	{
+		return usersTaskRepository.findAll();
+	}
 	
 	@GetMapping("/add")
 	public ModelAndView addTask(Model model)
@@ -31,19 +57,31 @@ public class TaskController
 	}
 	
 	@RequestMapping("/taskadded")
-	public ModelAndView showToDoList(@ModelAttribute Task task)
+	public ModelAndView addTask(@ModelAttribute Task task)
 	{
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		tasks.add(new Task(task.getName(), task.getDescription(), "TO DO"));
-		taskRepository.save(new User("bob", "123", tasks));
-		System.out.println((new User("bob", "123", tasks)).toString());
+		//get task object
+		Task taskObj = new Task(task.getName(), task.getDescription(), "TO DO");
+
+		//check if repository is empty
+		//if so, create new user and add task 
+		if (usersTaskRepository.findAll().isEmpty())
+		{
+			ArrayList<Task> tasks = new ArrayList<Task>();
+			tasks.add(taskObj);
+			usersTaskRepository.save(new User("bob", "123", tasks));
+			return new ModelAndView("taskadded");
+		}
+		
+		//add new task to list
+		usersTaskRepository.addTaskToList("bob", taskObj);
+
 		return new ModelAndView("taskadded");
 	}
-	
+
 	@GetMapping("/tasks")
 	public List<User> getTasks()
 	{
-		return (List<User>) taskRepository.findAll();
+		return (List<User>) usersTaskRepository.findAll();
 	}
 
 }

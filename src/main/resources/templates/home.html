@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>HomePage:</title>
+</head>
+<body>
+
+	<table style = "width:100%">
+		<tr> 
+			<th> TO DO </th>	
+		</tr>
+		<tr th:each="user : ${usersInfo}">
+			<td th:text="${user.tasks}"> </td>
+		</tr>
+	
+	</table>
+
+</body>
+</html>

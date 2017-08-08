@@ -35,4 +35,16 @@ public class UsersTaskRepositoryImpl implements UsersTaskRepositoryCustom
 		
 	}
 
+	@Override
+	public int updateTask(String username, String taskName, String status) {
+	//	( { name : "ash", "tasks.name":"milk"}, 
+	//			{ $set: {"tasks.$.status": "in progress"} })
+		Criteria criteria = Criteria.where("username").is(username).and("tasks.name").is(taskName);
+		Update update = new Update();
+		update.set("tasks.$.status", status);
+		
+		mongoTemplate.updateFirst(Query.query(criteria), update, User.class);
+		return 0;
+	}
+
 }

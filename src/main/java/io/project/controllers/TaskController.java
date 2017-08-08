@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -76,6 +77,13 @@ public class TaskController
 		usersTaskRepository.addTaskToList("bob", taskObj);
 
 		return new ModelAndView("taskadded");
+	}
+	
+	@RequestMapping("/updatetask")
+	public ModelAndView updateTask(@RequestParam String taskName, @RequestParam String status)
+	{
+		usersTaskRepository.updateTask("bob", taskName, status);
+		return new ModelAndView("taskupdated");
 	}
 
 	@GetMapping("/tasks")

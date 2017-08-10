@@ -8,4 +8,6 @@ public interface UsersTaskRepositoryCustom
 	int addTaskToList(String username, Task task);
 	
 	int updateTask(String username, String taskName, String status);
+
+	int deleteTask(String username, String taskName);
 }

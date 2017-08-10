@@ -36,6 +36,7 @@ public class TaskController
 	@RequestMapping("/")
 	public ModelAndView home()
 	{
+		
 		List<User> usersInfo = usersTaskRepository.findAll();
 		Map<String, Object> model = new HashMap<String, Object>();
         model.put("userInfo", usersInfo);
@@ -60,12 +61,21 @@ public class TaskController
 	@RequestMapping("/taskadded")
 	public ModelAndView addTask(@ModelAttribute Task task)
 	{
+		String username = "bob";
 		//get task object
 		Task taskObj = new Task(task.getName(), task.getDescription(), "TO DO");
 
 		//check if repository is empty
 		//if so, create new user and add task 
 		if (usersTaskRepository.findAll().isEmpty())
+		{
+			ArrayList<Task> tasks = new ArrayList<Task>();
+			tasks.add(taskObj);
+			usersTaskRepository.save(new User("bob", "123", tasks));
+			return new ModelAndView("taskadded");
+		}
+		
+		if (usersTaskRepository.findByUsername(username) == null)
 		{
 			ArrayList<Task> tasks = new ArrayList<Task>();
 			tasks.add(taskObj);
@@ -84,6 +94,13 @@ public class TaskController
 	{
 		usersTaskRepository.updateTask("bob", taskName, status);
 		return new ModelAndView("taskupdated");
+	}
+	
+	@RequestMapping("/deletetask")
+	public ModelAndView updateTask(@RequestParam String taskName)
+	{
+		usersTaskRepository.deleteTask("bob", taskName);
+		return new ModelAndView("taskdeleted");
 	}
 
 	@GetMapping("/tasks")
